@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Routing\RouteFileRegistrar;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +17,31 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $images = DB::table('images')->get();
+    $myImages = $images->pluck('image')->all();
+    return view('welcome', ['imagesInView' => $myImages]);
+
+});
+
+Route::get('/about', function () {
+    return view('about');
+});
+
+Route::get('/create', function (){
+    return view('create');
+});
+Route::get('/show', function (){
+    return view('show');
+});
+Route::get('/edit', function (){
+    return view('edit');
+});
+
+Route::post('/store', function (Request $request){
+    $image = $request->file('image');
+    $filename = $image->store('uploads');
+    DB::table('images')->insert([
+        'image' => $filename,
+    ]);
+    return redirect('/');
 });
